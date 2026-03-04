@@ -204,8 +204,10 @@ with tab_corrida:
 
 # --- SECÇÃO DE CONSISTÊNCIA ---
 with tab_consistencia:
+    with tab_consistencia:
     st.header("Consistência de Treino")
-    q = text("SELECT data FROM lifts WHERE peso > 0 UNION SELECT data FROM corridas_intervaladas")
+    # REMOVIDO o text() - Passamos apenas a string
+    q = "SELECT data FROM lifts WHERE peso > 0 UNION SELECT data FROM corridas_intervaladas"
     df_d = conn.query(q, ttl=0)
     
     if not df_d.empty:

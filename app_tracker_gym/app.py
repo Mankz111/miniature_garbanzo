@@ -202,10 +202,8 @@ with tab_corrida:
                     s.commit()
                 st.rerun()
 
-# --- SECÇÃO DE CONSISTÊNCIA ---
 with tab_consistencia:
     st.header("Consistência de Treino")
-    # REMOVIDO o text() - Passamos apenas a string
     q = "SELECT data FROM lifts WHERE peso > 0 UNION SELECT data FROM corridas_intervaladas"
     df_d = conn.query(q, ttl=0)
     
@@ -218,18 +216,27 @@ with tab_consistencia:
         
         fig_cal = go.Figure(data=go.Heatmap(
             z=df_cal['treinou'], x=df_cal['data'].dt.isocalendar().week, y=df_cal['data'].dt.dayofweek,
-            colorscale=[[0, '#ebedf0'], [1, '#216e39']], showscale=False, xgap=4, ygap=4,
-            hovertext=df_cal['data'].dt.strftime('%d %b (%a)'), hoverinfo="text"
+            colorscale=[[0, '#ebedf0'], [1, '#216e39']], showscale=False, xgap=2, ygap=2, # Gaps menores para mobile
+            hovertext=df_cal['data'].dt.strftime('%d %b'), hoverinfo="text"
         ))
+        
         fig_cal.update_layout(
-            height=280, margin=dict(t=40, b=10, l=40, r=10),
+            height=220, 
+            margin=dict(t=30, b=0, l=30, r=5), # Margens super apertadas
             plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
-            yaxis=dict(tickvals=[0,1,2,3,4,5,6], ticktext=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], 
-                       autorange='reversed', fixedrange=True, showgrid=False, zeroline=False, scaleanchor="x", scaleratio=1),
-            xaxis=dict(tickvals=[1,5,9,14,18,22,27,31,36,40,44,48], 
-                       ticktext=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-                       range=[1, 53], fixedrange=True, showgrid=False, zeroline=False, side='top')
+            yaxis=dict(
+                tickvals=[0,1,2,3,4,5,6], ticktext=['S','T','Q','Q','S','S','D'], # Iniciais apenas
+                autorange='reversed', fixedrange=True, showgrid=False, zeroline=False, 
+                scaleanchor="x", scaleratio=1, tickfont=dict(size=10)
+            ),
+            xaxis=dict(
+                tickvals=[1, 9, 18, 27, 36, 44], # Menos meses para não atropelar
+                ticktext=['Jan', 'Mar', 'Mai', 'Jul', 'Set', 'Nov'],
+                range=[1, 53], fixedrange=True, showgrid=False, zeroline=False, 
+                side='top', tickfont=dict(size=10)
+            )
         )
+        # O segredo para mobile: permitir scroll horizontal se necessário
         st.plotly_chart(fig_cal, use_container_width=True, config={'displayModeBar': False})
     else:
         st.info("Ainda não existem treinos registados.")
